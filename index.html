@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BROKER // WL</title>
+<meta name="description" content="BROKER whitelist. Complete three tasks, drop your address.">
+<meta property="og:title" content="BROKER // WL">
+<meta property="og:description" content="Complete three tasks, drop your address.">
+<meta name="theme-color" content="#060606">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:     #060606;
+  --bg2:    #0d0d0d;
+  --bg3:    #111;
+  --border: #1a1f1a;
+  --green:  #22c55e;
+  --green2: #16a34a;
+  --dim:    #2d5a3d;
+  --muted:  #4a7a58;
+  --purple: #818cf8;
+  --text:   #d1fae5;
+  --on:     #f0fdf4;
+  --red:    #f87171;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+button,input,textarea,select{font-family:inherit}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Space Mono',monospace;
+  font-size:13px;
+  line-height:1.7;
+  min-height:100dvh;
+}
+
+/* scanline overlay */
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  background:repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,.18) 0px,
+    rgba(0,0,0,.18) 1px,
+    transparent 1px,
+    transparent 4px
+  );
+  pointer-events:none;
+  z-index:999;
+}
+
+.wrap{max-width:680px;margin:0 auto;padding:0 20px 80px}
+
+/* ---------- header ---------- */
+
+.hdr{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:20px 0 20px;
+  border-bottom:1px solid var(--border);
+  margin-bottom:40px;
+}
+
+.hdr-title{
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.25em;
+  color:var(--green);
+  text-transform:uppercase;
+}
+
+.hdr-sub{
+  font-size:11px;
+  letter-spacing:.12em;
+  color:var(--muted);
+}
+
+/* ---------- prompt line ---------- */
+
+.prompt{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:12px;
+  color:var(--muted);
+  margin-bottom:28px;
+}
+
+.prompt .ps{
+  color:var(--green);
+  font-weight:700;
+  white-space:nowrap;
+}
+
+.prompt .msg{color:var(--text)}
+
+/* ---------- countdown ---------- */
+
+.timer{margin-bottom:44px}
+
+.timer-label{
+  font-size:11px;
+  letter-spacing:.15em;
+  color:var(--muted);
+  margin-bottom:16px;
+  text-transform:uppercase;
+}
+
+.digits{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+
+.unit{
+  border:1px solid var(--border);
+  background:var(--bg2);
+  padding:16px 4px 12px;
+  text-align:center;
+}
+
+.unit b{
+  display:block;
+  font-size:clamp(22px,6vw,30px);
+  color:var(--green);
+  font-weight:700;
+  line-height:1;
+  letter-spacing:.04em;
+}
+
+.unit span{
+  display:block;
+  margin-top:8px;
+  font-size:10px;
+  letter-spacing:.15em;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+
+/* ---------- alert ---------- */
+
+.alert{
+  border:1px solid var(--dim);
+  border-left:3px solid var(--green);
+  background:var(--bg2);
+  padding:20px 20px;
+  margin-bottom:36px;
+}
+
+.alert-tag{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:10px;
+  letter-spacing:.2em;
+  color:var(--green2);
+  text-transform:uppercase;
+  margin-bottom:14px;
+}
+
+.dot{
+  width:8px;height:8px;
+  background:var(--green);
+  border-radius:50%;
+  animation:pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
+.alert p{font-size:12px;line-height:1.8;color:var(--text);margin-bottom:8px}
+.alert p:last-child{margin-bottom:0}
+.alert b{color:var(--on);font-weight:700}
+.alert a{color:var(--purple);text-decoration:underline;text-underline-offset:3px}
+
+/* ---------- section block ---------- */
+
+.block{
+  border:1px solid var(--border);
+  background:var(--bg2);
+  margin-bottom:24px;
+}
+
+.block-head{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:14px 20px;
+  border-bottom:1px solid var(--border);
+}
+
+.block-head .ps{
+  color:var(--green);
+  font-weight:700;
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.block-head h2{
+  font-size:11px;
+  letter-spacing:.18em;
+  color:var(--muted);
+  font-weight:400;
+  text-transform:uppercase;
+}
+
+.block-body{padding:20px}
+
+.block-hint{
+  font-size:11px;
+  color:var(--muted);
+  letter-spacing:.05em;
+  margin-bottom:20px;
+  line-height:1.8;
+}
+
+/* ---------- tasks ---------- */
+
+.task{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:13px 0;
+  border-bottom:1px solid var(--border);
+}
+
+.task:last-of-type{border-bottom:none;padding-bottom:0}
+.task:first-of-type{padding-top:0}
+
+.task-n{
+  flex:none;
+  font-size:11px;
+  color:var(--dim);
+  font-weight:700;
+  min-width:20px;
+}
+
+.task.done .task-n{color:var(--green)}
+
+.task-text{
+  flex:1;
+  font-size:12px;
+  color:var(--text);
+  letter-spacing:.03em;
+}
+
+.task.done .task-text{
+  color:var(--muted);
+  text-decoration:line-through;
+}
+
+.task-btn{
+  flex:none;
+  font-size:10px;
+  letter-spacing:.15em;
+  text-transform:uppercase;
+  color:var(--green);
+  background:transparent;
+  border:1px solid var(--dim);
+  padding:7px 14px;
+  cursor:pointer;
+}
+
+.task-btn:hover:not(:disabled){border-color:var(--green);background:rgba(34,197,94,.07)}
+.task-btn.done-btn{color:var(--dim);cursor:default;border-color:var(--border)}
+
+/* ---------- form ---------- */
+
+.field{margin-bottom:18px}
+
+.field label{
+  display:block;
+  font-size:10px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--muted);
+  margin-bottom:8px;
+}
+
+.field label .opt{color:var(--dim);letter-spacing:.1em;text-transform:none}
+
+.input-wrap{
+  display:flex;
+  border:1px solid var(--border);
+  background:var(--bg3);
+}
+
+.input-wrap .ps2{
+  padding:12px 12px;
+  font-size:11px;
+  color:var(--green);
+  font-weight:700;
+  white-space:nowrap;
+  border-right:1px solid var(--border);
+  background:var(--bg2);
+}
+
+.input-wrap input{
+  flex:1;
+  padding:12px 12px;
+  font-size:12px;
+  color:var(--on);
+  background:transparent;
+  border:none;
+  letter-spacing:.03em;
+}
+
+.input-wrap input::placeholder{color:var(--dim)}
+.input-wrap input:focus{outline:none}
+.input-wrap:focus-within{border-color:var(--green2)}
+
+.err{display:none;margin-top:6px;font-size:10px;letter-spacing:.05em;color:var(--red)}
+.err.show{display:block}
+
+.burn-note{
+  border-left:2px solid var(--dim);
+  padding:12px 16px;
+  margin-bottom:20px;
+  font-size:11px;
+  line-height:1.8;
+  color:var(--muted);
+}
+
+.burn-note b{color:var(--text)}
+
+.gate-area{margin-top:8px}
+
+.submit{
+  width:100%;
+  padding:14px;
+  font-size:11px;
+  letter-spacing:.2em;
+  text-transform:uppercase;
+  color:var(--bg);
+  background:var(--green);
+  border:none;
+  cursor:pointer;
+  font-family:inherit;
+  font-weight:700;
+}
+
+.submit:hover:not(:disabled){background:var(--green2)}
+.submit:disabled{background:var(--dim);color:var(--bg2);cursor:not-allowed}
+.submit:focus-visible{outline:2px solid var(--purple);outline-offset:2px}
+
+.gate{
+  margin-top:8px;
+  font-size:10px;
+  letter-spacing:.08em;
+  color:var(--muted);
+  text-align:center;
+}
+
+/* ---------- success ---------- */
+
+.stamp{display:none}
+.stamp.show{display:block}
+
+.stamp-inner{
+  border:1px solid var(--green2);
+  background:var(--bg2);
+  padding:32px 24px;
+  text-align:center;
+}
+
+.stamp h2{
+  font-size:clamp(13px,4vw,17px);
+  letter-spacing:.2em;
+  color:var(--green);
+  text-transform:uppercase;
+  margin-bottom:16px;
+}
+
+.stamp p{font-size:11px;line-height:1.9;color:var(--muted)}
+
+/* ---------- footer ---------- */
+
+footer{
+  border-top:1px solid var(--border);
+  padding-top:20px;
+  margin-top:40px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:10px;
+  letter-spacing:.12em;
+  color:var(--dim);
+}
+
+footer a{color:var(--muted)}
+
+.cursor{
+  display:inline-block;
+  width:8px;height:13px;
+  background:var(--green);
+  vertical-align:middle;
+  animation:blink .85s steps(1) infinite;
+}
+
+@keyframes blink{50%{opacity:0}}
+
+.hidden{display:none}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+
+@media(max-width:460px){
+  .task{flex-wrap:wrap}
+  .task-text{flex:1 1 100%;order:2;margin-top:4px}
+  .task-btn{order:1;margin-left:auto}
+  .digits{gap:6px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hdr">
+    <div>
+      <div class="hdr-title">BROKER // WL</div>
+      <div class="hdr-sub">terminal · awaiting registration</div>
+    </div>
+    <span class="cursor"></span>
+  </header>
+
+  <div class="prompt">
+    <span class="ps">root@broker:~$</span>
+    <span class="msg">Complete three tasks and drop your address to register.</span>
+  </div>
+
+  <section class="timer">
+    <div class="timer-label">// registration closes in</div>
+    <div class="digits" role="timer" aria-live="off">
+      <div class="unit"><b id="dd">--</b><span>days</span></div>
+      <div class="unit"><b id="hh">--</b><span>hours</span></div>
+      <div class="unit"><b id="mm">--</b><span>min</span></div>
+      <div class="unit"><b id="ss">--</b><span>sec</span></div>
+    </div>
+  </section>
+
+  <section class="alert">
+    <p class="alert-tag"><span class="dot" aria-hidden="true"></span>SYSTEM // NOTICE</p>
+    <p>No exact time. Could drop at 3am your time.</p>
+    <p><b>Bell on for <a href="https://x.com/brokergod" target="_blank" rel="noopener">@brokergod</a>.</b> That's your only alert.</p>
+    <p><b>Get on the list now.</b></p>
+  </section>
+
+  <section class="block" id="taskBlock">
+    <div class="block-head">
+      <span class="ps">root@broker:~$</span>
+      <h2>tasks.sh</h2>
+    </div>
+    <div class="block-body">
+      <p class="block-hint">// execute each task, then confirm</p>
+
+      <div class="task" data-task="follow">
+        <span class="task-n">01</span>
+        <span class="task-text">Follow @brokergod on X</span>
+        <button class="task-btn" type="button">run</button>
+      </div>
+
+      <div class="task" data-task="like">
+        <span class="task-n">02</span>
+        <span class="task-text">Like the latest post</span>
+        <button class="task-btn" type="button">run</button>
+      </div>
+
+      <div class="task" data-task="repost">
+        <span class="task-n">03</span>
+        <span class="task-text">Repost the latest post</span>
+        <button class="task-btn" type="button">run</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="formBlock">
+    <div class="block-head">
+      <span class="ps">root@broker:~$</span>
+      <h2>register.sh</h2>
+    </div>
+    <div class="block-body">
+      <p class="block-hint">// double-check your addresses — misdirected NFTs cannot be recovered</p>
+
+      <div class="field">
+        <label for="handle">x_username</label>
+        <div class="input-wrap">
+          <span class="ps2">@</span>
+          <input type="text" id="handle" placeholder="username" autocomplete="off" spellcheck="false">
+        </div>
+        <p class="err" id="handleErr"></p>
+      </div>
+
+      <div class="field">
+        <label for="addr">zcash_unified_address</label>
+        <div class="input-wrap">
+          <span class="ps2">u1</span>
+          <input type="text" id="addr" placeholder="..." autocomplete="off" spellcheck="false">
+        </div>
+        <p class="err" id="addrErr"></p>
+      </div>
+
+      <div class="field">
+        <label for="evm">evm_address <span class="opt">// optional</span></label>
+        <div class="input-wrap">
+          <span class="ps2">0x</span>
+          <input type="text" id="evm" placeholder="..." autocomplete="off" spellcheck="false">
+        </div>
+        <p class="err" id="evmErr"></p>
+      </div>
+
+      <div class="burn-note">
+        <b>EVM mint?</b> Burn it and mint the Zcash version in its place.
+        Leave an EVM address so we can match your burn to this entry.
+        Skip it if you only want the Zcash mint.
+      </div>
+
+      <div style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden" aria-hidden="true">
+        <input type="text" id="website" tabindex="-1" autocomplete="off">
+      </div>
+
+      <div class="gate-area">
+        <button class="submit" id="submitBtn" type="button" disabled>SUBMIT_ENTRY</button>
+        <p class="gate" id="gate">// finish all three tasks first</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="stamp hidden" id="stamp">
+    <div class="stamp-inner">
+      <h2>// ENTRY CONFIRMED</h2>
+      <p>Results will be announced from @brokergod.<br>Stay following — the list is checked again before the mint.</p>
+    </div>
+  </section>
+
+  <footer>
+    <span>@brokergod · zcash</span>
+    <a href="https://x.com/brokergod" target="_blank" rel="noopener">x.com/brokergod</a>
+  </footer>
+
+</div>
+
+<script>
+/* =========================================================
+   CONFIG
+   ========================================================= */
+const CONFIG = {
+  formAction:  "https://docs.google.com/forms/d/e/1FAIpQLScsoAU1lY3Dt6ScEEKGP02uj0O7baFsHGWJxXDiyPcgIXe-7w/formResponse",
+  entryHandle: "entry.1782527894",
+  entryWallet: "entry.27121694",
+  entryEvm:    "entry.6387808",
+  deadline:    "2026-09-11T18:56:00+03:00",
+  xHandle:     "brokergod"
+};
+/* ======================================================= */
+
+const PROFILE = "https://x.com/" + CONFIG.xHandle;
+const INTENTS = {
+  follow: "https://x.com/intent/follow?screen_name=" + CONFIG.xHandle,
+  like:   PROFILE,
+  repost: PROFILE
+};
+
+const done = { follow:false, like:false, repost:false };
+let closed = false, sent = false;
+
+const $ = id => document.getElementById(id);
+
+/* ---------- tasks ---------- */
+
+document.querySelectorAll(".task").forEach(row => {
+  const key = row.dataset.task;
+  const btn = row.querySelector(".task-btn");
+
+  btn.addEventListener("click", () => {
+    if (done[key] || closed) return;
+
+    if (btn.dataset.opened !== "1") {
+      window.open(INTENTS[key], "_blank", "noopener");
+      btn.dataset.opened = "1";
+      btn.textContent = "done?";
+      return;
+    }
+
+    done[key] = true;
+    row.classList.add("done");
+    btn.classList.add("done-btn");
+    btn.textContent = "✓";
+    btn.disabled = true;
+    refreshGate();
+  });
+});
+
+/* ---------- validation ---------- */
+
+const ADDR = /^u1[02-9ac-hj-np-z]{50,}$/;
+const EVM  = /^(0x)?[a-fA-F0-9]{40}$/;
+const HAND = /^@?[A-Za-z0-9_]{1,15}$/;
+
+function setErr(el, msg){
+  el.textContent = msg;
+  el.classList.toggle("show", !!msg);
+}
+
+function checkHandle(q){
+  const v = $("handle").value.trim();
+  if (!v){ if(!q) setErr($("handleErr"),"// enter your X username"); return false; }
+  if (!HAND.test(v)){ if(!q) setErr($("handleErr"),"// letters, numbers, underscores — max 15"); return false; }
+  setErr($("handleErr"),""); return true;
+}
+
+function checkAddr(q){
+  const raw = $("addr").value.trim();
+  const v = raw.startsWith("u1") ? raw : "u1" + raw;
+  if (!raw){ if(!q) setErr($("addrErr"),"// enter your Zcash unified address"); return false; }
+  if (!ADDR.test(v)){ if(!q) setErr($("addrErr"),"// must be a unified address — should start with u1"); return false; }
+  setErr($("addrErr"),""); return true;
+}
+
+function checkEvm(q){
+  const v = $("evm").value.trim();
+  if (!v){ setErr($("evmErr"),""); return true; }
+  const bare = v.startsWith("0x") ? v.slice(2) : v;
+  if (!EVM.test(bare)){ if(!q) setErr($("evmErr"),"// 0x followed by 40 hex characters"); return false; }
+  setErr($("evmErr"),""); return true;
+}
+
+$("handle").addEventListener("blur", () => checkHandle(false));
+$("addr").addEventListener("blur", () => checkAddr(false));
+$("evm").addEventListener("blur", () => checkEvm(false));
+["handle","addr","evm"].forEach(id => {
+  $(id).addEventListener("input", () => { setErr($(id+"Err"),""); refreshGate(); });
+});
+
+function refreshGate(){
+  const tasksOk = done.follow && done.like && done.repost;
+  const fieldsOk = checkHandle(true) && checkAddr(true) && checkEvm(true);
+  const ok = tasksOk && fieldsOk && !closed && !sent;
+  $("submitBtn").disabled = !ok;
+
+  if (closed)          $("gate").textContent = "// registration is closed";
+  else if (!tasksOk)   $("gate").textContent = "// finish all three tasks first";
+  else if (!fieldsOk)  $("gate").textContent = "// fill in your username and address";
+  else                 $("gate").textContent = "// ready to submit";
+}
+
+/* ---------- submit ---------- */
+
+$("submitBtn").addEventListener("click", async () => {
+  if (sent || closed || $("website").value) return;
+  if (!checkHandle(false) || !checkAddr(false) || !checkEvm(false)) return;
+
+  const btn = $("submitBtn");
+  btn.disabled = true; btn.textContent = "SENDING...";
+
+  const raw = $("addr").value.trim();
+  const zcashAddr = raw.startsWith("u1") ? raw : "u1" + raw;
+  const evmRaw = $("evm").value.trim();
+  const evmAddr = evmRaw && !evmRaw.startsWith("0x") ? "0x" + evmRaw : evmRaw;
+
+  const body = new FormData();
+  body.append(CONFIG.entryHandle, $("handle").value.trim().replace(/^@/,""));
+  body.append(CONFIG.entryWallet, zcashAddr);
+  body.append(CONFIG.entryEvm,    evmAddr);
+
+  try {
+    await fetch(CONFIG.formAction, { method:"POST", mode:"no-cors", body });
+    sent = true;
+    $("taskBlock").classList.add("hidden");
+    $("formBlock").classList.add("hidden");
+    $("stamp").classList.remove("hidden");
+    $("stamp").classList.add("show");
+    $("stamp").scrollIntoView({ behavior:"smooth", block:"center" });
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = "SUBMIT_ENTRY";
+    setErr($("addrErr"), "// connection error — check your network and retry");
+  }
+});
+
+/* ---------- countdown ---------- */
+
+const END = new Date(CONFIG.deadline).getTime();
+const pad = n => String(n).padStart(2,"0");
+
+function tick(){
+  const left = END - Date.now();
+  if (left <= 0){
+    closed = true;
+    ["dd","hh","mm","ss"].forEach(id => $(id).textContent = "00");
+    document.querySelector(".timer-label").textContent = "// registration closed";
+    $("submitBtn").disabled = true;
+    document.querySelectorAll(".task-btn").forEach(b => b.disabled = true);
+    refreshGate();
+    clearInterval(t);
+    return;
+  }
+  const s = Math.floor(left/1000);
+  $("dd").textContent = pad(Math.floor(s/86400));
+  $("hh").textContent = pad(Math.floor(s/3600)%24);
+  $("mm").textContent = pad(Math.floor(s/60)%60);
+  $("ss").textContent = pad(s%60);
+}
+
+let t = null;
+tick();
+if(END > Date.now()) t = setInterval(tick,1000);
+refreshGate();
+</script>
+</body>
+</html>
