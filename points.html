@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BROKERGOD // POINTS</title>
+<meta name="description" content="Earn points. Reach 250. Get whitelisted.">
+<meta property="og:title" content="BROKERGOD // POINTS">
+<meta property="og:description" content="Earn points. Reach 250. Get whitelisted.">
+<meta name="theme-color" content="#060606">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:    #060606;
+  --bg2:   #0d0d0d;
+  --bg3:   #111;
+  --bdr:   #1a1f1a;
+  --green: #22c55e;
+  --g2:    #16a34a;
+  --dim:   #2d5a3d;
+  --muted: #4a7a58;
+  --purp:  #818cf8;
+  --amber: #fbbf24;
+  --text:  #d1fae5;
+  --on:    #f0fdf4;
+  --red:   #f87171;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+button,input{font-family:inherit}
+html{-webkit-text-size-adjust:100%}
+
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Space Mono',monospace;
+  font-size:13px;
+  line-height:1.7;
+  padding:0 20px 80px;
+  min-height:100dvh;
+}
+
+body::before{
+  content:'';position:fixed;inset:0;
+  background:repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0px,rgba(0,0,0,.18) 1px,transparent 1px,transparent 4px);
+  pointer-events:none;z-index:999;
+}
+
+.wrap{max-width:680px;margin:0 auto}
+
+/* header */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:20px 0;border-bottom:1px solid var(--bdr);margin-bottom:40px}
+.hdr-title{font-size:13px;font-weight:700;letter-spacing:.25em;color:var(--green)}
+.hdr-sub{font-size:11px;letter-spacing:.12em;color:var(--muted)}
+.cursor{display:inline-block;width:8px;height:13px;background:var(--green);vertical-align:middle;animation:blink .85s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* blocks */
+.block{border:1px solid var(--bdr);background:var(--bg2);margin-bottom:20px}
+.block-head{display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--bdr);background:var(--bg3)}
+.block-head .ps{color:var(--green);font-weight:700;font-size:12px;white-space:nowrap}
+.block-head h2{font-size:11px;letter-spacing:.18em;color:var(--muted);font-weight:400;text-transform:uppercase}
+.block-body{padding:20px 18px}
+.block-hint{font-size:11px;color:var(--muted);letter-spacing:.04em;margin-bottom:18px;line-height:1.8}
+
+/* prompt */
+.prompt{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--muted);margin-bottom:36px}
+.prompt .ps{color:var(--green);font-weight:700;white-space:nowrap}
+.prompt .msg{color:var(--text)}
+
+/* invited banner */
+.invited{display:none;border:1px solid var(--dim);border-left:3px solid var(--amber);background:var(--bg2);padding:16px 18px;margin-bottom:24px;font-size:12px}
+.invited .lbl{font-size:10px;letter-spacing:.2em;color:var(--amber);margin-bottom:8px}
+.invited b{color:var(--on)}
+
+/* enter screen */
+#scEnter{display:block}
+#scDash{display:none}
+
+.enter-field{margin-bottom:20px}
+.enter-field label{display:block;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+
+.input-row{display:flex;border:1px solid var(--bdr)}
+.input-row .ps{padding:14px 14px;font-size:12px;font-weight:700;color:var(--green);border-right:1px solid var(--bdr);background:var(--bg3);white-space:nowrap}
+.input-row input{flex:1;padding:14px 14px;font-size:12px;color:var(--on);background:var(--bg2);border:none;letter-spacing:.03em}
+.input-row input::placeholder{color:var(--dim)}
+.input-row input:focus{outline:none}
+.input-row:focus-within{border-color:var(--g2)}
+
+.cta{width:100%;padding:14px;font-size:10px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--bg);background:var(--green);border:none;cursor:pointer}
+.cta:hover:not(:disabled){background:var(--g2)}
+.cta:disabled{background:var(--dim);color:var(--bg2);cursor:not-allowed}
+.cta:focus-visible{outline:2px solid var(--purp);outline-offset:2px}
+
+.err{display:none;margin-top:8px;font-size:10px;letter-spacing:.05em;color:var(--red)}
+.err.show{display:block}
+
+/* points bar */
+.pts-bar-wrap{margin-bottom:28px}
+.pts-bar-head{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;letter-spacing:.08em;color:var(--muted);margin-bottom:12px}
+.pts-bar-head .big{font-size:24px;color:var(--green);font-weight:700;letter-spacing:.03em}
+.pts-bar-head .target{font-size:11px;color:var(--dim)}
+.bar-track{height:6px;background:var(--bg3);border:1px solid var(--bdr);margin-bottom:8px}
+.bar-fill{height:100%;background:var(--green);transition:width .4s ease}
+.bar-fill.done{background:var(--amber)}
+.pts-sub{font-size:10px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
+
+/* handle display */
+.handle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px}
+.handle-row .hdl{font-size:14px;font-weight:700;color:var(--green);letter-spacing:.05em}
+.handle-row .reset-btn{font-size:9px;letter-spacing:.15em;color:var(--dim);background:none;border:1px solid var(--bdr);padding:6px 10px;cursor:pointer}
+.handle-row .reset-btn:hover{color:var(--muted);border-color:var(--muted)}
+
+/* tasks */
+.task-row{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--bdr)}
+.task-row:last-child{border-bottom:none;padding-bottom:0}
+.task-row:first-child{padding-top:0}
+.task-num{flex:none;font-size:10px;font-weight:700;color:var(--dim);min-width:22px;letter-spacing:.05em}
+.task-row.done .task-num{color:var(--green)}
+.task-txt{flex:1;font-size:12px;color:var(--text);letter-spacing:.02em}
+.task-pts{flex:none;font-size:10px;color:var(--dim);letter-spacing:.1em;margin-right:8px}
+.task-row.done .task-pts{color:var(--green)}
+.task-row.done .task-txt{color:var(--muted);text-decoration:line-through}
+.task-btn{flex:none;font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--green);background:transparent;border:1px solid var(--dim);padding:7px 12px;cursor:pointer}
+.task-btn:hover:not(:disabled){border-color:var(--green);background:rgba(34,197,94,.07)}
+.task-btn.done{color:var(--dim);cursor:default;border-color:var(--bdr)}
+
+/* referral */
+.ref-link-row{display:flex;border:1px solid var(--bdr);background:var(--bg3);margin-bottom:16px}
+.ref-link-row .ref-url{flex:1;padding:12px 14px;font-size:10px;color:var(--muted);letter-spacing:.04em;word-break:break-all;line-height:1.6}
+.ref-link-row .copy-btn{flex:none;padding:0 16px;font-size:9px;font-weight:700;letter-spacing:.15em;color:var(--green);background:none;border:none;border-left:1px solid var(--bdr);cursor:pointer;text-transform:uppercase;white-space:nowrap}
+.ref-link-row .copy-btn:hover{background:var(--dim)}
+
+.ref-count-row{display:flex;align-items:center;gap:12px;margin-bottom:20px}
+.ref-count{font-size:22px;font-weight:700;color:var(--amber);letter-spacing:.04em}
+.ref-count-lbl{font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase}
+.sync-btn{margin-left:auto;font-size:9px;letter-spacing:.15em;color:var(--muted);background:none;border:1px solid var(--bdr);padding:7px 14px;cursor:pointer;text-transform:uppercase}
+.sync-btn:hover{border-color:var(--muted);color:var(--text)}
+
+/* pts breakdown */
+.breakdown{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:0}
+.bk-item{border:1px solid var(--bdr);background:var(--bg3);padding:14px 12px;text-align:center}
+.bk-item b{display:block;font-size:18px;color:var(--green);font-weight:700;letter-spacing:.04em;margin-bottom:4px}
+.bk-item span{font-size:9px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase}
+
+/* wl claim */
+.wl-gate{display:none;border:1px solid var(--g2);background:var(--bg2);margin-bottom:20px}
+.wl-gate.open{display:block}
+.wl-gate .block-head{border-color:var(--g2)}
+.wl-gate .block-head h2{color:var(--green)}
+
+.field{margin-bottom:16px}
+.field label{display:block;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.field .opt{color:var(--dim);letter-spacing:.08em;text-transform:none}
+.field-row{display:flex;border:1px solid var(--bdr);background:var(--bg3)}
+.field-row .fps{padding:12px 12px;font-size:11px;font-weight:700;color:var(--green);border-right:1px solid var(--bdr);background:var(--bg2);white-space:nowrap}
+.field-row input{flex:1;padding:12px 12px;font-size:11px;color:var(--on);background:transparent;border:none;letter-spacing:.02em}
+.field-row input::placeholder{color:var(--dim)}
+.field-row input:focus{outline:none}
+.field-row:focus-within{border-color:var(--g2)}
+.ferr{display:none;margin-top:6px;font-size:10px;color:var(--red)}
+.ferr.show{display:block}
+
+/* success */
+.success{display:none;border:1px solid var(--g2);background:var(--bg2);padding:28px 20px;text-align:center}
+.success.show{display:block}
+.success h2{font-size:clamp(11px,3.5vw,14px);letter-spacing:.2em;color:var(--green);text-transform:uppercase;margin-bottom:14px}
+.success p{font-size:11px;line-height:1.9;color:var(--muted)}
+
+/* note */
+.note{border-left:2px solid var(--dim);padding:12px 16px;font-size:11px;line-height:1.9;color:var(--muted);margin-bottom:16px}
+.note b{color:var(--text)}
+.note a{color:var(--purp)}
+
+/* footer */
+footer{border-top:1px solid var(--bdr);padding-top:18px;margin-top:40px;display:flex;justify-content:space-between;font-size:10px;letter-spacing:.12em;color:var(--dim)}
+footer a{color:var(--muted)}
+
+.hidden{display:none}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media(max-width:460px){
+  .breakdown{grid-template-columns:repeat(3,1fr);gap:6px}
+  .ref-count-row{flex-wrap:wrap}
+  .sync-btn{margin-left:0}
+  .block-body{padding:16px 14px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hdr">
+    <div>
+      <div class="hdr-title">BROKERGOD // POINTS</div>
+      <div class="hdr-sub">terminal · earn points · get whitelisted</div>
+    </div>
+    <span class="cursor"></span>
+  </header>
+
+  <!-- ===================== ENTER SCREEN ===================== -->
+  <section id="scEnter">
+
+    <div class="prompt">
+      <span class="ps">root@brokergod:~$</span>
+      <span class="msg">Earn 250 points to secure your whitelist spot.</span>
+    </div>
+
+    <div class="invited" id="invitedBanner">
+      <div class="lbl">// INVITED BY</div>
+      <p>You were referred by <b id="inviterHandle">@—</b>. Their referral will be logged when you initialize.</p>
+    </div>
+
+    <div class="block">
+      <div class="block-head">
+        <span class="ps">root@brokergod:~$</span>
+        <h2>initialize.sh</h2>
+      </div>
+      <div class="block-body">
+        <p class="block-hint">// enter your x username to begin tracking points</p>
+
+        <div class="enter-field">
+          <label for="initHandle">x_username</label>
+          <div class="input-row">
+            <span class="ps">@</span>
+            <input type="text" id="initHandle" placeholder="username" autocomplete="off" spellcheck="false">
+          </div>
+          <p class="err" id="initErr"></p>
+        </div>
+
+        <button class="cta" id="initBtn" type="button">INITIALIZE</button>
+      </div>
+    </div>
+
+    <div class="block">
+      <div class="block-head">
+        <span class="ps">root@brokergod:~$</span>
+        <h2>points_system.sh</h2>
+      </div>
+      <div class="block-body">
+        <p class="block-hint">// how to earn points</p>
+        <div class="task-row" style="padding-top:0">
+          <span class="task-num">01</span>
+          <span class="task-txt">Follow @brokergod</span>
+          <span class="task-pts">+1 pt</span>
+        </div>
+        <div class="task-row">
+          <span class="task-num">02</span>
+          <span class="task-txt">Like the latest post</span>
+          <span class="task-pts">+1 pt</span>
+        </div>
+        <div class="task-row">
+          <span class="task-num">03</span>
+          <span class="task-txt">Repost the latest post</span>
+          <span class="task-pts">+1 pt</span>
+        </div>
+        <div class="task-row" style="border-bottom:none;padding-bottom:0">
+          <span class="task-num">★</span>
+          <span class="task-txt">Each referral who joins</span>
+          <span class="task-pts" style="color:var(--amber)">+2 pts</span>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ===================== DASHBOARD ===================== -->
+  <section id="scDash">
+
+    <div class="handle-row">
+      <span class="hdl" id="dashHandle">@—</span>
+      <button class="reset-btn" id="resetBtn" type="button">reset_session</button>
+    </div>
+
+    <!-- points bar -->
+    <div class="pts-bar-wrap">
+      <div class="pts-bar-head">
+        <div>
+          <span class="big" id="ptsTotal">0</span>
+          <span class="target"> / 250 pts</span>
+        </div>
+        <span id="ptsStatus">// keep going</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" id="barFill" style="width:0%"></div></div>
+      <div class="pts-sub" id="ptsSub">0 pts to whitelist</div>
+    </div>
+
+    <!-- breakdown -->
+    <div class="block">
+      <div class="block-head">
+        <span class="ps">root@brokergod:~$</span>
+        <h2>pts_breakdown.sh</h2>
+      </div>
+      <div class="block-body">
+        <div class="breakdown">
+          <div class="bk-item"><b id="bkTask">0</b><span>task pts</span></div>
+          <div class="bk-item"><b id="bkRef">0</b><span>ref pts</span></div>
+          <div class="bk-item"><b id="bkTotal">0</b><span>total</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- tasks -->
+    <div class="block">
+      <div class="block-head">
+        <span class="ps">root@brokergod:~$</span>
+        <h2>tasks.sh</h2>
+      </div>
+      <div class="block-body">
+        <p class="block-hint">// complete each task and confirm</p>
+
+        <div class="task-row" data-task="follow">
+          <span class="task-num">01</span>
+          <span class="task-txt">Follow @brokergod</span>
+          <span class="task-pts">+1 pt</span>
+          <button class="task-btn" type="button">run</button>
+        </div>
+
+        <div class="task-row" data-task="like">
+          <span class="task-num">02</span>
+          <span class="task-txt">Like the latest post</span>
+          <span class="task-pts">+1 pt</span>
+          <button class="task-btn" type="button">run</button>
+        </div>
+
+        <div class="task-row" data-task="rt">
+          <span class="task-num">03</span>
+          <span class="task-txt">Repost the latest post</span>
+          <span class="task-pts">+1 pt</span>
+          <button class="task-btn" type="button">run</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- referral -->
+    <div class="block">
+      <div class="block-head">
+        <span class="ps">root@brokergod:~$</span>
+        <h2>referral.sh</h2>
+      </div>
+      <div class="block-body">
+        <p class="block-hint">// share your link · every click = +2 pts</p>
+
+        <div class="ref-link-row">
+          <span class="ref-url" id="refUrl">—</span>
+          <button class="copy-btn" id="copyRef" type="button">COPY</button>
+        </div>
+
+        <div class="ref-count-row">
+          <div>
+            <div class="ref-count" id="refCount">—</div>
+            <div class="ref-count-lbl">referrals</div>
+          </div>
+          <button class="sync-btn" id="syncBtn" type="button">SYNC_REFERRALS</button>
+        </div>
+
+
+      </div>
+    </div>
+
+    <!-- WL claim (unlocks at 250) -->
+    <div class="wl-gate" id="wlGate">
+      <div class="block-head">
+        <span class="ps">root@brokergod:~$</span>
+        <h2>claim_wl.sh <span style="color:var(--amber);margin-left:8px;font-size:10px">// 250 PTS REACHED</span></h2>
+      </div>
+      <div class="block-body">
+        <p class="block-hint">// you earned your spot · submit your address to claim</p>
+
+        <div class="field">
+          <label for="claimZec">zcash_unified_address</label>
+          <div class="field-row">
+            <span class="fps">u1</span>
+            <input type="text" id="claimZec" placeholder="..." autocomplete="off" spellcheck="false">
+          </div>
+          <p class="ferr" id="claimZecErr"></p>
+        </div>
+
+        <div class="field">
+          <label for="claimEvm">evm_address <span class="opt">// optional</span></label>
+          <div class="field-row">
+            <span class="fps">0x</span>
+            <input type="text" id="claimEvm" placeholder="..." autocomplete="off" spellcheck="false">
+          </div>
+          <p class="ferr" id="claimEvmErr"></p>
+        </div>
+
+        <button class="cta" id="claimBtn" type="button">CLAIM_WHITELIST</button>
+        <p class="err" id="claimGate" style="text-align:center;margin-top:8px;font-size:10px;color:var(--muted);display:block">// fill in your Zcash address to claim</p>
+      </div>
+    </div>
+
+    <!-- claim success -->
+    <div class="success" id="claimSuccess">
+      <h2>// WHITELIST_CLAIMED</h2>
+      <p>Your spot is confirmed. Results announced from <a href="https://x.com/brokergod" target="_blank" rel="noopener" style="color:var(--purp)">@brokergod</a>.<br>Keep referring — more points = stronger position.</p>
+    </div>
+
+  </section>
+
+  <footer>
+    <span>@brokergod · zcash</span>
+    <a href="https://x.com/brokergod" target="_blank" rel="noopener">x.com/brokergod</a>
+  </footer>
+
+</div>
+
+<script>
+/* =========================================================
+   CONFIG — fill before deploying
+   ========================================================= */
+const CONFIG = {
+  xHandle:      "brokergod",
+  latestPost:   "https://x.com/brokergod", // swap for pinned post URL
+
+  // Referral log form (2 questions: referrer handle, referee handle)
+  refFormAction:   "https://docs.google.com/forms/d/e/1FAIpQLSdRwBChak8HNYt2DuRpHFIv1smOBfmyxrjXskHDMVfc7e4xLg/formResponse",
+  refEntryReferrer:"entry.404286948",
+  refEntryReferee: "entry.1855812017",
+
+  // WL claim form (3 questions: handle, zec address, evm address)
+  claimFormAction: "https://docs.google.com/forms/d/e/1FAIpQLSddjPmEtb99bSAyR5V3O_PB2N6N1My2z5aWS2Cp4LmlYQVrCA/formResponse",
+  claimEntryHandle:"entry.498297902",
+  claimEntryZec:   "entry.587972472",
+  claimEntryEvm:   "entry.912399265",
+
+  // Publish the referral sheet as CSV then this auto-works.
+  // Sheets → File → Share → Publish to web → Form Yanıtları 1 → CSV
+  referralCsvUrl: "https://docs.google.com/spreadsheets/d/e/2PACX-1vR5OBnLS-XGswjzbg8DPqnxf33yP7oH6t7_sNE-iHuyslJNhYC6PMTwUdGwITQhL57nef7-laNZ8OI-/pub?output=csv",
+
+  WL_THRESHOLD: 250,
+  TASK_PTS:     1,
+  REF_PTS:      2,
+};
+/* ======================================================= */
+
+const INTENTS = {
+  follow: "https://x.com/intent/follow?screen_name=" + CONFIG.xHandle,
+  like:   CONFIG.latestPost,
+  rt:     CONFIG.latestPost,
+};
+
+const UA   = /^u1[02-9ac-hj-np-z]{50,}$/;
+const EVM  = /^(0x)?[a-fA-F0-9]{40}$/;
+const HAND = /^@?[A-Za-z0-9_]{1,15}$/;
+
+const $ = id => document.getElementById(id);
+
+/* ---------- state ---------- */
+
+function loadState(){
+  try { return JSON.parse(localStorage.getItem("bg_pts") || "null"); }
+  catch { return null; }
+}
+
+function saveState(s){ localStorage.setItem("bg_pts", JSON.stringify(s)); }
+
+function freshState(handle){
+  return { handle, tasks:{ follow:false, like:false, rt:false }, refs:0, refsCounted:false, claimed:false };
+}
+
+/* ---------- points ---------- */
+
+function calcPts(s){
+  const tp = Object.values(s.tasks).filter(Boolean).length * CONFIG.TASK_PTS;
+  const rp = s.refs * CONFIG.REF_PTS;
+  return { task:tp, ref:rp, total:tp+rp };
+}
+
+function refreshUI(s){
+  const p = calcPts(s);
+  const pct = Math.min(100, (p.total / CONFIG.WL_THRESHOLD) * 100).toFixed(1);
+
+  $("ptsTotal").textContent  = p.total;
+  $("barFill").style.width   = pct + "%";
+  if (p.total >= CONFIG.WL_THRESHOLD) $("barFill").classList.add("done");
+  else $("barFill").classList.remove("done");
+
+  const left = Math.max(0, CONFIG.WL_THRESHOLD - p.total);
+  $("ptsSub").textContent = left > 0 ? left + " pts to whitelist" : "whitelist unlocked";
+  $("ptsStatus").textContent = p.total >= CONFIG.WL_THRESHOLD
+    ? "// whitelist unlocked"
+    : "// " + pct + "% complete";
+
+  $("bkTask").textContent  = p.task;
+  $("bkRef").textContent   = p.ref;
+  $("bkTotal").textContent = p.total;
+
+  $("refCount").textContent = s.refs;
+
+  // task rows
+  document.querySelectorAll(".task-row[data-task]").forEach(row => {
+    const k = row.dataset.task;
+    const done = s.tasks[k];
+    row.classList.toggle("done", done);
+    const btn = row.querySelector(".task-btn");
+    if (done){ btn.textContent = "✓"; btn.classList.add("done"); btn.disabled = true; }
+  });
+
+  // WL gate
+  if (p.total >= CONFIG.WL_THRESHOLD && !s.claimed){
+    $("wlGate").classList.add("open");
+  }
+
+  if (s.claimed){
+    $("wlGate").classList.remove("open");
+    $("claimSuccess").classList.add("show");
+  }
+}
+
+/* ---------- referral sync ---------- */
+
+async function syncRefs(s){
+  if (!CONFIG.referralCsvUrl){ return; }
+  $("syncBtn").textContent = "SYNCING...";
+  $("syncBtn").disabled = true;
+  try {
+    const res = await fetch(CONFIG.referralCsvUrl + "&t=" + Date.now());
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const text = await res.text();
+    const rows = text.split(/\r?\n/).slice(1).filter(Boolean);
+    const handle = s.handle.toLowerCase().replace(/^@/, "");
+    const count = rows.filter(r => {
+      const cols = r.split(",");
+      // col 0 = timestamp, col 1 = referrer, col 2 = referee
+      const referrer = (cols[1] || "").replace(/^"|"$/g,"").trim().toLowerCase().replace(/^@/,"");
+      return referrer === handle;
+    }).length;
+    s.refs = count;
+    s.refsCounted = true;
+    saveState(s);
+    refreshUI(s);
+    $("refCount").textContent = count;
+    $("manualSection").style.display = "none";
+  } catch(e){
+    console.error("sync failed", e);
+  }
+  $("syncBtn").textContent = "SYNC_REFERRALS";
+  $("syncBtn").disabled = false;
+}
+
+/* ---------- referral log ---------- */
+
+async function logReferral(referrer, referee){
+  const key = "ref_logged_" + referrer.toLowerCase();
+  if (localStorage.getItem(key)) return;  // already logged this session
+  const body = new FormData();
+  body.append(CONFIG.refEntryReferrer, referrer.replace(/^@/,""));
+  body.append(CONFIG.refEntryReferee,  referee.replace(/^@/,"") || "anonymous");
+  try {
+    await fetch(CONFIG.refFormAction, { method:"POST", mode:"no-cors", body });
+    localStorage.setItem(key, "1");
+  } catch(e){ console.error("ref log failed", e); }
+}
+
+/* ---------- init screen ---------- */
+
+const urlRef = new URLSearchParams(location.search).get("ref");
+
+if (urlRef){
+  $("inviterHandle").textContent = "@" + urlRef.replace(/^@/,"");
+  $("invitedBanner").style.display = "block";
+  // log the visit immediately — every click counts as 1 referral
+  logReferral(urlRef, "visit_" + Date.now());
+}
+
+$("initBtn").addEventListener("click", async () => {
+  const raw = $("initHandle").value.trim();
+  if (!HAND.test(raw)){
+    $("initErr").textContent = "// letters, numbers, underscores — max 15";
+    $("initErr").classList.add("show");
+    return;
+  }
+  const handle = raw.replace(/^@/,"");
+  const s = freshState(handle);
+
+  saveState(s);
+  showDash(s);
+});
+
+$("initHandle").addEventListener("keydown", e => { if (e.key === "Enter") $("initBtn").click(); });
+
+/* ---------- dashboard ---------- */
+
+function showDash(s){
+  $("scEnter").style.display = "none";
+  $("scDash").style.display  = "block";
+  $("dashHandle").textContent = "@" + s.handle;
+
+  // referral link
+  const base = location.origin + location.pathname;
+  $("refUrl").textContent = base + "?ref=" + s.handle;
+
+  refreshUI(s);
+}
+
+/* ---------- tasks ---------- */
+
+document.querySelectorAll(".task-row[data-task]").forEach(row => {
+  const key = row.dataset.task;
+  const btn = row.querySelector(".task-btn");
+
+  btn.addEventListener("click", () => {
+    const s = loadState(); if (!s) return;
+    if (s.tasks[key]) return;
+
+    if (btn.dataset.opened !== "1"){
+      window.open(INTENTS[key], "_blank", "noopener");
+      btn.dataset.opened = "1";
+      btn.textContent = "done?";
+      return;
+    }
+
+    s.tasks[key] = true;
+    saveState(s);
+    refreshUI(s);
+  });
+});
+
+/* ---------- referral controls ---------- */
+
+$("copyRef").addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText($("refUrl").textContent);
+    $("copyRef").textContent = "OK";
+    setTimeout(() => $("copyRef").textContent = "COPY", 1500);
+  } catch(e){ $("copyRef").textContent = "ERR"; }
+});
+
+$("syncBtn").addEventListener("click", () => {
+  const s = loadState(); if (!s) return;
+  syncRefs(s);
+});
+
+/* ---------- WL claim ---------- */
+
+$("claimBtn").addEventListener("click", async () => {
+  const s = loadState(); if (!s) return;
+  const p = calcPts(s);
+  if (p.total < CONFIG.WL_THRESHOLD) return;
+
+  const rawZec = $("claimZec").value.trim();
+  const zec    = rawZec.startsWith("u1") ? rawZec : "u1" + rawZec;
+  const rawEvm = $("claimEvm").value.trim();
+  const evm    = rawEvm && !rawEvm.startsWith("0x") ? "0x" + rawEvm : rawEvm;
+
+  let ok = true;
+  if (!UA.test(zec)){
+    $("claimZecErr").textContent = "// unified address starting with u1";
+    $("claimZecErr").classList.add("show");
+    ok = false;
+  } else $("claimZecErr").classList.remove("show");
+
+  if (rawEvm && !EVM.test(rawEvm)){
+    $("claimEvmErr").textContent = "// 0x followed by 40 hex characters";
+    $("claimEvmErr").classList.add("show");
+    ok = false;
+  } else $("claimEvmErr").classList.remove("show");
+
+  if (!ok) return;
+
+  $("claimBtn").disabled = true;
+  $("claimBtn").textContent = "CLAIMING...";
+
+  const body = new FormData();
+  body.append(CONFIG.claimEntryHandle, s.handle);
+  body.append(CONFIG.claimEntryZec,    zec);
+  body.append(CONFIG.claimEntryEvm,    evm);
+
+  try {
+    await fetch(CONFIG.claimFormAction, { method:"POST", mode:"no-cors", body });
+    s.claimed = true;
+    saveState(s);
+    refreshUI(s);
+  } catch(e){
+    $("claimBtn").disabled = false;
+    $("claimBtn").textContent = "CLAIM_WHITELIST";
+    $("claimZecErr").textContent = "// connection error — try again";
+    $("claimZecErr").classList.add("show");
+  }
+});
+
+/* ---------- reset ---------- */
+
+$("resetBtn").addEventListener("click", () => {
+  if (!confirm("Reset session? Your task progress will be lost.")) return;
+  localStorage.removeItem("bg_pts");
+  location.href = location.pathname;
+});
+
+/* ---------- boot ---------- */
+
+(function boot(){
+  const s = loadState();
+  if (s && s.handle){ showDash(s); return; }
+
+  // check for ?ref without being logged in
+  if (urlRef){
+    $("invitedBanner").style.display = "block";
+  }
+})();
+</script>
+</body>
+</html>
